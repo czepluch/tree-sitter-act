@@ -1917,47 +1917,11 @@
         },
         {
           "type": "STRING",
-          "value": "CALLDEPTH"
-        },
-        {
-          "type": "STRING",
           "value": "ORIGIN"
         },
         {
           "type": "STRING",
-          "value": "BLOCKHASH"
-        },
-        {
-          "type": "STRING",
-          "value": "BLOCKNUMBER"
-        },
-        {
-          "type": "STRING",
-          "value": "DIFFICULTY"
-        },
-        {
-          "type": "STRING",
-          "value": "CHAINID"
-        },
-        {
-          "type": "STRING",
-          "value": "GASLIMIT"
-        },
-        {
-          "type": "STRING",
-          "value": "COINBASE"
-        },
-        {
-          "type": "STRING",
-          "value": "TIMESTAMP"
-        },
-        {
-          "type": "STRING",
           "value": "THIS"
-        },
-        {
-          "type": "STRING",
-          "value": "NONCE"
         }
       ]
     },

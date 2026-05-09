@@ -2299,18 +2299,6 @@
     "named": false
   },
   {
-    "type": "BLOCKHASH",
-    "named": false
-  },
-  {
-    "type": "BLOCKNUMBER",
-    "named": false
-  },
-  {
-    "type": "CALLDEPTH",
-    "named": false
-  },
-  {
     "type": "CALLER",
     "named": false
   },
@@ -2319,35 +2307,11 @@
     "named": false
   },
   {
-    "type": "CHAINID",
-    "named": false
-  },
-  {
-    "type": "COINBASE",
-    "named": false
-  },
-  {
-    "type": "DIFFICULTY",
-    "named": false
-  },
-  {
-    "type": "GASLIMIT",
-    "named": false
-  },
-  {
-    "type": "NONCE",
-    "named": false
-  },
-  {
     "type": "ORIGIN",
     "named": false
   },
   {
     "type": "THIS",
-    "named": false
-  },
-  {
-    "type": "TIMESTAMP",
     "named": false
   },
   {

@@ -286,11 +286,10 @@ module.exports = grammar({
 
     maps_to: $ => seq(field('key', $._expr), '=>', field('value', $._expr)),
 
-    env_var: _ => choice(
-      'CALLER', 'CALLVALUE', 'CALLDEPTH', 'ORIGIN',
-      'BLOCKHASH', 'BLOCKNUMBER', 'DIFFICULTY', 'CHAINID',
-      'GASLIMIT', 'COINBASE', 'TIMESTAMP', 'THIS', 'NONCE',
-    ),
+    // Parse.y only accepts these four in expression position; the lexer
+    // declares more (CALLDEPTH, BLOCKHASH, ...) but they have no parser
+    // rule. Match upstream rather than over-accept.
+    env_var: _ => choice('CALLER', 'CALLVALUE', 'ORIGIN', 'THIS'),
 
     ref_expr: $ => $.ref,
 
