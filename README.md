@@ -8,6 +8,15 @@ language for EVM smart contracts.
 `constructor` / `transition` syntax (not the legacy `behaviour` / `storage`
 syntax still present in `act/examples/`).
 
+## VS Code / VSCodium / Cursor
+
+This grammar is for tree-sitter-native editors (Neovim, Helix, Zed, ...).
+For VS Code-family editors, install the
+[vscode-act](https://github.com/czepluch/vscode-act) extension instead -
+download the `.vsix` from its
+[releases](https://github.com/czepluch/vscode-act/releases) and run
+`code --install-extension vscode-act-*.vsix`.
+
 ## Quick install (lazy.nvim / LazyVim)
 
 Drop this into `~/.config/nvim/lua/plugins/act.lua` and restart Neovim.
