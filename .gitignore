@@ -1,0 +1,18 @@
+node_modules/
+build/
+target/
+*.log
+.DS_Store
+
+# Generated parser sources - commit these for consumers who install from the
+# repo without running tree-sitter generate.
+# Uncomment the lines below if you'd rather keep them out of git.
+# src/parser.c
+# src/grammar.json
+# src/node-types.json
+# src/tree_sitter/
+
+# Build artifacts from node-gyp / cargo
+*.node
+Cargo.lock
+bindings/node/build/

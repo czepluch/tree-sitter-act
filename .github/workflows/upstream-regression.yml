@@ -1,0 +1,100 @@
+name: Upstream regression
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  regress:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Install tree-sitter-cli
+        run: npm install
+
+      - name: Generate parser
+        run: npx tree-sitter generate
+
+      - name: Clone act
+        run: git clone --depth 1 https://github.com/argotorg/act.git ../act
+
+      - name: Capture act SHA
+        id: act
+        run: echo "sha=$(git -C ../act rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Parse tests/**/*.act
+        id: parse
+        run: |
+          fails=()
+          total=0
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            total=$((total+1))
+            if ! npx tree-sitter parse "$f" --quiet >/dev/null 2>&1; then
+              fails+=("${f#../act/}")
+            fi
+          done < <(find ../act/tests -name '*.act' -type f)
+          {
+            echo "total=$total"
+            echo "failed=${#fails[@]}"
+            echo "files<<FILES_EOF"
+            if [ ${#fails[@]} -gt 0 ]; then
+              printf '%s\n' "${fails[@]}"
+            fi
+            echo "FILES_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Report status
+        run: |
+          echo "Tracked act@${{ steps.act.outputs.sha }}"
+          echo "Parsed ${{ steps.parse.outputs.total }} files; ${{ steps.parse.outputs.failed }} failures"
+
+      - name: File or update issue on regression
+        if: steps.parse.outputs.failed != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ steps.act.outputs.sha }}
+          FAILED: ${{ steps.parse.outputs.failed }}
+          TOTAL: ${{ steps.parse.outputs.total }}
+          FILES: ${{ steps.parse.outputs.files }}
+        run: |
+          short_sha=${SHA:0:7}
+          body=$(cat <<EOF
+          Upstream regression detected on act@\`${short_sha}\` ([commit log](https://github.com/argotorg/act/commits/${SHA})).
+
+          \`${FAILED}\` of \`${TOTAL}\` files in \`act/tests/\` produce ERROR nodes:
+
+          \`\`\`
+          ${FILES}
+          \`\`\`
+
+          Triage: read the diff in \`src/Act/Lex.x\` / \`src/Act/Parse.y\` since the last clean run.
+          EOF
+          )
+
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --label upstream-regression --state open --json number --jq '.[0].number // empty')
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
+            echo "Updated existing issue #$existing"
+          else
+            gh issue create \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "Upstream regression: act@${short_sha}" \
+              --label upstream-regression \
+              --body "$body"
+          fi
+
+      - name: Fail job on regression
+        if: steps.parse.outputs.failed != '0'
+        run: exit 1

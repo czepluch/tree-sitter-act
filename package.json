@@ -1,0 +1,39 @@
+{
+  "name": "tree-sitter-act",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for the Act specification language (.act)",
+  "main": "bindings/node",
+  "types": "bindings/node",
+  "keywords": [
+    "parser",
+    "tree-sitter",
+    "act",
+    "evm",
+    "verification"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/czepluch/tree-sitter-act"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "tree-sitter generate",
+    "test": "tree-sitter test",
+    "parse": "tree-sitter parse"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.25.0"
+  },
+  "tree-sitter": [
+    {
+      "scope": "source.act",
+      "file-types": [
+        "act"
+      ],
+      "highlights": "queries/act/highlights.scm",
+      "injections": "queries/act/injections.scm",
+      "folds": "queries/act/folds.scm",
+      "locals": "queries/act/locals.scm"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+contract C
+
+constructor()
+
+creates
+   uint x := 0
+
+invariants
+  x == 0
+	
+transition bar(uint z)
+
+case z == 0:
+
+updates
+  x := z
+
+case 0 < z:
+
+updates
+  x := 0

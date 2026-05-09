@@ -1,0 +1,33 @@
+contract ITE
+
+constructor(uint256 y)
+
+creates
+
+    uint256 x := if y == 2 then 1 else 4
+
+invariants
+
+    x < 5
+
+transition f(int56 z)
+
+case z < 10:
+
+    updates
+
+        x := if z == 5 then 4 else 1
+
+case 10 <= z and z < 100:
+
+    updates
+
+        x := if z == 50 then 3 else 2
+
+
+
+case z >= 100:
+
+    updates
+
+        x := if z == 50 then 3 else 2

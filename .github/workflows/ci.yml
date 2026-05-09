@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Install tree-sitter-cli
+        run: npm install
+
+      - name: Generate parser
+        run: npx tree-sitter generate
+
+      - name: Run corpus tests
+        run: npx tree-sitter test
+
+      - name: Smoke-test examples (fail on ERROR nodes)
+        run: |
+          fail=0
+          for f in examples/*.act; do
+            [ -f "$f" ] || continue
+            if ! npx tree-sitter parse "$f" --quiet >/dev/null 2>&1; then
+              echo "::error file=$f::Contains ERROR node"
+              fail=1
+            fi
+          done
+          exit $fail

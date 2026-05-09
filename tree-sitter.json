@@ -1,0 +1,37 @@
+{
+  "grammars": [
+    {
+      "name": "act",
+      "camelcase": "Act",
+      "scope": "source.act",
+      "path": ".",
+      "file-types": ["act"],
+      "highlights": "queries/act/highlights.scm",
+      "injections": "queries/act/injections.scm",
+      "locals": "queries/act/locals.scm",
+      "tags": "queries/act/tags.scm",
+      "injection-regex": "^act$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for the Act specification language (.act)",
+    "authors": [
+      {
+        "name": "Jacob Czepluch"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/czepluch/tree-sitter-act"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": false,
+    "node": true,
+    "python": false,
+    "rust": true,
+    "swift": false
+  }
+}
