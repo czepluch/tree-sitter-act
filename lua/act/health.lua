@@ -17,15 +17,19 @@ local QUERY_NAMES = {
 function M.check()
   vim.health.start("act")
 
-  -- Parser
-  local ok, err = pcall(vim.treesitter.language.add, "act")
-  if ok then
+  -- Parser. language.add returns false (not throws) when the parser .so
+  -- can't be found on runtimepath, so check the return value too.
+  local ok, added = pcall(vim.treesitter.language.add, "act")
+  if ok and added then
     vim.health.ok("parser 'act' is loadable")
   else
+    local detail = ok and "language.add returned false (parser .so not found on runtimepath)"
+                       or ("exception: " .. tostring(added))
     vim.health.error(
-      "parser 'act' not loadable: " .. tostring(err),
+      "parser 'act' not loadable - " .. detail,
       {
         "Run :Lazy build tree-sitter-act to rebuild the parser.",
+        "Check that ~/.local/share/nvim/site/parser/act.so exists.",
         "Check that a C compiler (cc / clang / gcc) is on PATH.",
       }
     )
