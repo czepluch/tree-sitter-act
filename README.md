@@ -30,6 +30,21 @@ seven queries registered, and filetype mapped.
 Open any `.act` file, try `:InspectTree` to see the parse tree and
 `:Inspect` on a token to see which highlight captures applied.
 
+### Troubleshooting
+
+If `:checkhealth act` reports `parser 'act' not loadable - language.add
+returned false`, the `build` step didn't produce
+`~/.local/share/nvim/site/parser/act.so`. Run it by hand:
+
+```bash
+cd $(nvim -e -c 'lua print(require("lazy.core.config").options.root)' -c 'q' 2>/dev/null)/tree-sitter-act \
+  || cd ~/.local/share/nvim/lazy/tree-sitter-act
+mkdir -p ~/.local/share/nvim/site/parser
+cc -O2 -shared -fPIC -I src src/parser.c -o ~/.local/share/nvim/site/parser/act.so
+```
+
+Then `:edit` the `.act` buffer to reload.
+
 ## What you get
 
 - Syntax highlighting for `.act` files: keywords (`contract`,
@@ -40,6 +55,64 @@ Open any `.act` file, try `:InspectTree` to see the parse tree and
 - Scope-aware identifier highlighting via `locals.scm`
 - Textobject motions (with `nvim-treesitter-textobjects` or `mini.ai`)
 - Code folding and symbol outlines via `folds.scm` / `tags.scm`
+
+---
+
+## Alternative install paths
+
+### Plain Neovim (manual, no package manager)
+
+Clone the repo somewhere on Neovim's runtime path so the bundled
+`ftdetect/` and `queries/act/` directories get picked up, then compile
+the parser:
+
+```bash
+git clone https://github.com/czepluch/tree-sitter-act \
+  ~/.local/share/nvim/site/pack/plugins/start/tree-sitter-act
+cd "$_"
+mkdir -p ~/.local/share/nvim/site/parser
+cc -O2 -shared -fPIC -I src src/parser.c \
+   -o ~/.local/share/nvim/site/parser/act.so
+```
+
+That's it - restart Neovim and `:checkhealth act` should pass. The
+`src/parser.c` is committed, so this path needs **only a C compiler**;
+no Node, no `tree-sitter` CLI.
+
+### Development (working on the grammar itself)
+
+```bash
+cd /path/to/tree-sitter-act
+npm install                                   # one-time
+npx tree-sitter generate                      # regenerate src/parser.c
+npx tree-sitter test                          # corpus tests
+npx tree-sitter build -o ~/.local/share/nvim/site/parser/act.so
+```
+
+Iteration loop after edits:
+
+```bash
+npx tree-sitter generate && npx tree-sitter test
+npx tree-sitter build -o ~/.local/share/nvim/site/parser/act.so
+# :edit the buffer in Neovim to reload
+```
+
+Query file edits are picked up on `:edit` alone - no parser rebuild.
+
+For a development install where Neovim picks up your local checkout
+(rather than re-cloning), use lazy.nvim's `dir =` pointing at your
+working directory:
+
+```lua
+{
+  "czepluch/tree-sitter-act",
+  dir = "/path/to/your/tree-sitter-act",
+  build = "...",  -- as above
+  ft = "act",
+}
+```
+
+---
 
 ## Repository layout
 
@@ -75,25 +148,6 @@ The grammar is written directly against:
 
 When in doubt, those files are the source of truth. See `CLAUDE.md` for
 maintainer-facing notes.
-
-## Development
-
-```bash
-npm install
-npx tree-sitter generate
-npx tree-sitter test
-npx tree-sitter parse path/to/file.act
-```
-
-Iteration loop after edits:
-
-```bash
-npx tree-sitter generate && npx tree-sitter test
-npx tree-sitter build -o ~/.local/share/nvim/site/parser/act.so
-# :edit the buffer in Neovim to reload
-```
-
-Query file edits are picked up on `:edit` alone - no parser rebuild.
 
 ## License
 
