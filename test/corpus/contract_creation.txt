@@ -1,0 +1,90 @@
+==================
+new Contract(args) in creates
+==================
+
+contract A
+constructor(uint v)
+    iff true
+    creates
+        uint y := 0
+
+contract B
+constructor(uint v)
+    iff true
+    creates
+        A a := new A(v)
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface
+        (arg
+          type: (arg_type (abi_type (uint_type)))
+          name: (identifier)))
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type (abi_type (uint_type)))
+            name: (identifier)
+            value: (int_literal))))))
+  (contract
+    name: (identifier)
+    (constructor
+      (interface
+        (arg
+          type: (arg_type (abi_type (uint_type)))
+          name: (identifier)))
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type
+              (contract_type (identifier)))
+            name: (identifier)
+            value: (create_expr
+              contract: (identifier)
+              (ref_expr (ref (identifier))))))))))
+
+==================
+new Contract with value
+==================
+
+contract A
+constructor()
+    iff true
+    creates
+
+contract B
+constructor()
+    iff true
+    creates
+        A a := new A{value: 100}()
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates))))
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type
+              (contract_type (identifier)))
+            name: (identifier)
+            value: (create_expr
+              contract: (identifier)
+              value: (int_literal))))))))

@@ -1,0 +1,144 @@
+==================
+Boolean precedence: not binds tighter than and/or
+==================
+
+contract C
+constructor()
+    iff
+        a == b and not c == d
+    creates
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions
+        (binary_expr
+          left: (binary_expr
+            left: (ref_expr (ref (identifier)))
+            right: (ref_expr (ref (identifier))))
+          right: (unary_expr
+            operand: (binary_expr
+              left: (ref_expr (ref (identifier)))
+              right: (ref_expr (ref (identifier)))))))
+      (constr_cases
+        (creates)))))
+
+==================
+Numeric precedence: a * b ^ c % d binds as a * ((b ^ c) % d)
+==================
+
+contract C
+constructor()
+    iff
+        a * b ^ c % d == 0
+    creates
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions
+        (binary_expr
+          left: (binary_expr
+            left: (ref_expr (ref (identifier)))
+            right: (binary_expr
+              left: (binary_expr
+                left: (ref_expr (ref (identifier)))
+                right: (ref_expr (ref (identifier))))
+              right: (ref_expr (ref (identifier)))))
+          right: (int_literal)))
+      (constr_cases
+        (creates)))))
+
+==================
+If-then-else expression
+==================
+
+contract C
+constructor()
+    iff true
+    creates
+        uint x := if a > 0 then 1 else 2
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type (abi_type (uint_type)))
+            name: (identifier)
+            value: (ite_expr
+              cond: (binary_expr
+                left: (ref_expr (ref (identifier)))
+                right: (int_literal))
+              then: (int_literal)
+              else: (int_literal))))))))
+
+==================
+inRange and address(0)
+==================
+
+contract C
+constructor()
+    iff
+        inRange(uint256, x + 1)
+    creates
+        address owner := address(0)
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions
+        (in_range_expr
+          type: (abi_type (uint_type))
+          value: (binary_expr
+            left: (ref_expr (ref (identifier)))
+            right: (int_literal))))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type (abi_type))
+            name: (identifier)
+            value: (address_cast (int_literal))))))))
+
+==================
+Negative integer literal as a single token
+==================
+
+contract C
+constructor()
+    iff true
+    creates
+        int x := -42
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type (abi_type (int_type)))
+            name: (identifier)
+            value: (int_literal)))))))

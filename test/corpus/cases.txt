@@ -1,0 +1,142 @@
+==================
+Transition with multiple cases
+==================
+
+contract C
+constructor()
+    iff true
+    creates
+        uint x := 0
+
+transition bar(uint z)
+case z == 0:
+    updates
+        x := z
+case 0 < z:
+    updates
+        x := 0
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type (abi_type (uint_type)))
+            name: (identifier)
+            value: (int_literal)))))
+    (transition
+      name: (identifier)
+      (interface
+        (arg
+          type: (arg_type (abi_type (uint_type)))
+          name: (identifier)))
+      (cases
+        (case
+          (binary_expr
+            left: (ref_expr (ref (identifier)))
+            right: (int_literal))
+          (post
+            (updates
+              (store
+                lhs: (ref (identifier))
+                rhs: (ref_expr (ref (identifier)))))))
+        (case
+          (binary_expr
+            left: (int_literal)
+            right: (ref_expr (ref (identifier))))
+          (post
+            (updates
+              (store
+                lhs: (ref (identifier))
+                rhs: (int_literal)))))))))
+
+==================
+Case with empty post (no updates, no returns)
+==================
+
+contract C
+constructor()
+    iff true
+    creates
+        uint x := 0
+
+transition f()
+case x == 0:
+case 0 < x:
+    updates
+        x := 0
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type (abi_type (uint_type)))
+            name: (identifier)
+            value: (int_literal)))))
+    (transition
+      name: (identifier)
+      (interface)
+      (cases
+        (case
+          (binary_expr
+            left: (ref_expr (ref (identifier)))
+            right: (int_literal)))
+        (case
+          (binary_expr
+            left: (int_literal)
+            right: (ref_expr (ref (identifier))))
+          (post
+            (updates
+              (store
+                lhs: (ref (identifier))
+                rhs: (int_literal)))))))))
+
+==================
+Returns without explicit updates
+==================
+
+contract C
+constructor()
+    iff true
+    creates
+        uint x := 0
+
+transition read() : uint256
+    returns x
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type (abi_type (uint_type)))
+            name: (identifier)
+            value: (int_literal)))))
+    (transition
+      name: (identifier)
+      (interface)
+      (return_type
+        (arg_type (abi_type (uint_type))))
+      (cases
+        (post
+          (returns
+            (ref_expr (ref (identifier)))))))))

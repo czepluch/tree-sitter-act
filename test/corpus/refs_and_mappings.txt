@@ -1,0 +1,155 @@
+==================
+Mapping literal in creates
+==================
+
+contract C
+constructor()
+    iff true
+    creates
+        mapping(address => uint) balance := [CALLER => 100]
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type
+              (mapping_type
+                key: (value_type (abi_type))
+                value: (value_type (abi_type (uint_type)))))
+            name: (identifier)
+            value: (mapping_expr
+              (maps_to
+                key: (env_var)
+                value: (int_literal)))))))))
+
+==================
+Mapping update in transition
+==================
+
+contract C
+constructor()
+    iff true
+    creates
+        mapping(address => uint) bal := [CALLER => 0]
+
+transition set(address a, uint v)
+    iff true
+    updates
+        bal := bal[a => v]
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type
+              (mapping_type
+                key: (value_type (abi_type))
+                value: (value_type (abi_type (uint_type)))))
+            name: (identifier)
+            value: (mapping_expr
+              (maps_to
+                key: (env_var)
+                value: (int_literal)))))))
+    (transition
+      name: (identifier)
+      (interface
+        (arg
+          type: (arg_type (abi_type))
+          name: (identifier))
+        (arg
+          type: (arg_type (abi_type (uint_type)))
+          name: (identifier)))
+      (preconditions (bool_literal))
+      (cases
+        (post
+          (updates
+            (store
+              lhs: (ref (identifier))
+              rhs: (mapping_update_expr
+                (ref (identifier))
+                (maps_to
+                  key: (ref_expr (ref (identifier)))
+                  value: (ref_expr (ref (identifier))))))))))))
+
+==================
+Pre and post refs with nested index/field
+==================
+
+contract C
+constructor()
+    iff true
+    creates
+        mapping(address => uint) bal := [CALLER => 0]
+
+transition f() : uint256
+    iff true
+    returns pre(bal[CALLER])
+    ensures
+        post(bal[CALLER]) >= pre(bal[CALLER])
+
+------------------
+
+(source_file
+  (contract
+    name: (identifier)
+    (constructor
+      (interface)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type
+              (mapping_type
+                key: (value_type (abi_type))
+                value: (value_type (abi_type (uint_type)))))
+            name: (identifier)
+            value: (mapping_expr
+              (maps_to
+                key: (env_var)
+                value: (int_literal)))))))
+    (transition
+      name: (identifier)
+      (interface)
+      (return_type
+        (arg_type (abi_type (uint_type))))
+      (preconditions (bool_literal))
+      (cases
+        (post
+          (returns
+            (ref_expr
+              (ref
+                (pre_ref
+                  (ref
+                    (index_ref
+                      (ref (identifier))
+                      (env_var)))))))))
+      (ensures
+        (binary_expr
+          left: (ref_expr
+            (ref
+              (post_ref
+                (ref
+                  (index_ref
+                    (ref (identifier))
+                    (env_var))))))
+          right: (ref_expr
+            (ref
+              (pre_ref
+                (ref
+                  (index_ref
+                    (ref (identifier))
+                    (env_var)))))))))))

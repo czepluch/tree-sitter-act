@@ -1,0 +1,31 @@
+==================
+Line comments are ignored
+==================
+
+// top of file comment
+contract C // trailing on contract line
+// before constructor
+constructor() // trailing
+    iff true
+    creates
+        uint x := 0 // trailing on store
+
+------------------
+
+(source_file
+  (line_comment)
+  (contract
+    name: (identifier)
+    (line_comment)
+    (line_comment)
+    (constructor
+      (interface)
+      (line_comment)
+      (preconditions (bool_literal))
+      (constr_cases
+        (creates
+          (create
+            type: (value_type (abi_type (uint_type)))
+            name: (identifier)
+            value: (int_literal))))))
+  (line_comment))
